@@ -8,7 +8,8 @@ Created on Fri Jun 03 16:31:13 2016
 
 import numpy as np
 import pandas as pd
-from random import randint
+from random import sample
+import Distances as Dist
 
 class K_Modes:
 	"""Classe K-Modes
@@ -34,7 +35,7 @@ class K_Modes:
 	reset_Att --> Permite ao usuário inserir novos atributos
 	Seed_Init --> Inicializa as centroides 
 	cluster --> Recebe um DataSet e performa o agrupamento de acordo com seus atributos
-
+	randInit --> Método aleatório de inicialização de centroides
 	"""
 
 	def __init__(self, numClusters, DistType, num_iter=100, init='random', runs=1):
@@ -54,14 +55,39 @@ class K_Modes:
 		return
 
 	def Seed_Init(self, DataSet):
-		rows = DataSet.shape[0]
-		cols = DataSet.shape[1]
-		centroids = np.zeros((self.numClusters, cols))
+		if (self.init == 'random'):
+			self.centroids = self.randInit(DataSet)
+		else:
+			print 'No such method'
+		indexList = self.centroids.index.tolist() #Pega a lista dos índices de cada centroide no dataSet
+		self.clusters = [indexList[i:i+1] for i in range (0,len(indexList))] #cria uma lista de listas, cada sublista é um cluster, que contém os índices no DataSet dos padrões que pertencem ao cluster
+		self.centroids.index = range(self.centroids.shape[0]) #Modificação estética, renomeia as linhas dos centróides
 		return
 
-	def cluster(self, DataSet):
-		self.clusters = [[]]*self.numClusters #Lista de listas. Cada lista representa um cluster, que contém os índices dos objetos do DataSet
-		newClusters = [[]]*self.numClusters
+	def randInit(self, DataSet):
 		rows = DataSet.shape[0]
 		cols = DataSet.shape[1]
+		index = sample(range(0,rows), self.numClusters) #cria um array de numClusters elementos aleatórios
+		return DataSet.iloc[index,:] #pega os padrões correspondentes aos índices aleatórios
+
+	def cluster(self, DataSet):
+		newClusters = [[] for i in range (self.numClusters)]
+		rows = DataSet.shape[0]
+		cols = DataSet.shape[1]
+
+		for it in range(self.num_iter):
+			for i in range(rows): 
+				A = DataSet.iloc[i,:] 
+				dist = []
+				#calcula uma lista de distâncias entre o padrão A e cada centroide
+				for j in range(self.numClusters):
+					B = self.centroids.iloc[j,:]
+					dist.append(Dist.GetDistance(A, B)) 
+				#O padrão A é inserido no cluster do centroide que der a menor distância
+				minInd = np.argmin(dist)
+				newClusters[minInd].append(i)
+
+
+
+
 		return

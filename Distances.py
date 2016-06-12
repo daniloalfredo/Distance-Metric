@@ -9,7 +9,7 @@ def Hamming_Distance(InstanceA, InstanceB):
 	return buliano.sum()
 
 #Função genérica de distância entre dados categóricos
-def Get_Distance(InstanceA, InstanceB, DistType):
+def GetDistance(InstanceA, InstanceB, DistType):
 	if DistType == 'Hamming':
 		return Hamming_Distance(InstanceA, InstanceB)
 	else:
