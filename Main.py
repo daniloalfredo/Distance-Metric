@@ -1,5 +1,11 @@
+# -*- coding: utf-8 -*-
+
 import numpy as np
 import pandas as pd
+from random import randint
+
+import KModes as Kmodes
+import Distances as Dist
 
 #MAIN
 dataSet = pd.read_csv('Datasets/Mushroom/agaricus-lepiota.csv')
@@ -15,4 +21,4 @@ indB = randint(0, rows)
 A = dataSet.iloc[indA,:]
 B = dataSet.iloc[indB,:]
 
-print 'Distância de Hamming entre objeto ' + str(indA) + ' e objeto ' + str(indB) + ' = ' + str(Hamming_Distance(A, B))
+print 'Distância de Hamming entre objeto ' + str(indA) + ' e objeto ' + str(indB) + ' = ' + str(Dist.Hamming_Distance(A, B))
