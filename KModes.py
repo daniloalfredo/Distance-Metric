@@ -65,29 +65,39 @@ class K_Modes:
 		return
 
 	def randInit(self, DataSet):
-		rows = DataSet.shape[0]
-		cols = DataSet.shape[1]
+		rows,cols = DataSet.shape
 		index = sample(range(0,rows), self.numClusters) #cria um array de numClusters elementos aleatórios
 		return DataSet.iloc[index,:] #pega os padrões correspondentes aos índices aleatórios
 
 	def cluster(self, DataSet):
-		newClusters = [[] for i in range (self.numClusters)]
-		rows = DataSet.shape[0]
-		cols = DataSet.shape[1]
+		rows,cols = DataSet.shape
+		self.Seed_Init(DataSet)
 
 		for it in range(self.num_iter):
+			newClusters = [[] for i in range (self.numClusters)]
+			#agrupa os padrões de acordo com os centroides
+			print "iteracao" + str(it)
 			for i in range(rows): 
 				A = DataSet.iloc[i,:] 
 				dist = []
 				#calcula uma lista de distâncias entre o padrão A e cada centroide
 				for j in range(self.numClusters):
 					B = self.centroids.iloc[j,:]
-					dist.append(Dist.GetDistance(A, B)) 
+					dist.append(Dist.GetDistance(A, B, self.DistType)) 
 				#O padrão A é inserido no cluster do centroide que der a menor distância
 				minInd = np.argmin(dist)
 				newClusters[minInd].append(i)
 
+			#Re-calcula os centroides
+			for k in range(self.numClusters):
+				cluster = DataSet.iloc[newClusters[k],:]
+				self.centroids.iloc[k,:] = cluster.mode().iloc[0]
 
+			self.clusters = newClusters
+		return
 
+	def displayClusters(self, DataSet):
+		for i in range(self.numClusters):
+			print DataSet.iloc[self.clusters[i],:]
 
 		return

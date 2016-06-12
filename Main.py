@@ -4,16 +4,29 @@ import numpy as np
 import pandas as pd
 from random import randint
 
-import KModes as Kmodes
+import KModes as K
 import Distances as Dist
 
 #MAIN
-dataSet = pd.read_csv('Datasets/Mushroom/agaricus-lepiota.csv')
-rows = dataSet.shape[0]
-cols = dataSet.shape[1]
 
-for i in range(0,cols):
+#DataSet info
+dataSet = pd.read_csv('Datasets/Soybean/soybean-small.csv')
+rows,cols = dataSet.shape
+dataSet = dataSet.iloc[:, range(cols-1)]
+numClusters = 4
+DistType = 'Hamming'
+numero_iteracoes = 40
+
+#
+for i in range(0,cols-1):
     dataSet.iloc[:, i] = dataSet.iloc[:, i].astype('category') #Transforma os dados para a representação categórica do Pandas
+
+#Executa o K-Modes com os parametros acima
+'''kmode = K.K_Modes(numClusters, DistType, num_iter=numero_iteracoes)
+print "Clustering Soybean..."
+kmode.cluster(dataSet)
+
+kmode.displayClusters(dataSet)'''
 
 indA = randint(0, rows)
 indB = randint(0, rows)    
@@ -21,4 +34,6 @@ indB = randint(0, rows)
 A = dataSet.iloc[indA,:]
 B = dataSet.iloc[indB,:]
 
-print 'Distância de Hamming entre objeto ' + str(indA) + ' e objeto ' + str(indB) + ' = ' + str(Dist.Hamming_Distance(A, B))
+print 'Distância DM1 entre objeto ' + str(indA) + ' e objeto ' + str(indB) + ' = ' + str(Dist.DM1(A, B, dataSet))
+
+print 'Distância Hamming entre objeto ' + str(indA) + ' e objeto ' + str(indB) + ' = ' + str(Dist.Hamming_Distance(A, B))
