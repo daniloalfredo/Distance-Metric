@@ -83,7 +83,7 @@ class K_Modes:
 				#calcula uma lista de distâncias entre o padrão A e cada centroide
 				for j in range(self.numClusters):
 					B = self.centroids.iloc[j,:]
-					dist.append(Dist.GetDistance(A, B, self.DistType)) 
+					dist.append(Dist.GetDistance(A, B, self.DistType, DataSet)) 
 				#O padrão A é inserido no cluster do centroide que der a menor distância
 				minInd = np.argmin(dist)
 				newClusters[minInd].append(i)
