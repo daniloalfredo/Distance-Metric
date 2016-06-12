@@ -12,14 +12,16 @@ def DM1(InstanceA, InstanceB, DataSet):
 	rows,cols = DataSet.shape
 	Dist = 0
 	for i in range(cols):
-		valueA = InstanceA.iloc[i] # valor do atributo i para a instância A
+		valueA = InstanceA.iloc[i]
 		valueB = InstanceB.iloc[i]
 		if (valueB != valueA):
+			valueA = pd.Categorical([valueA])
+			valueB = pd.Categorical([valueB])
 			count = DataSet.iloc[:,i].value_counts() #Retorna um Series (estrutura da dados do Pandas) contendo a quantidade de padrões com cada valor
-			P_a = float(count.loc[pd.Categorical([valueA])])/rows #Fórmula (17) do artigo
-			P_b = float(count.loc[pd.Categorical([valueB])])/rows
-			P_a_minus = float(count.loc[pd.Categorical([valueA])] - 1)/(rows - 1) #Fórmula (18)
-			P_b_minus = float(count.loc[pd.Categorical([valueB])] - 1)/(rows - 1)
+			P_a = float(count.loc[valueA])/rows #Fórmula (17) do artigo
+			P_b = float(count.loc[valueB])/rows
+			P_a_minus = float(count.loc[valueA] - 1)/(rows - 1) #Fórmula (18)
+			P_b_minus = float(count.loc[valueB] - 1)/(rows - 1)
 			Dist += P_a*P_a_minus + P_b*P_b_minus #Fórmula (21)
 	return Dist
 
