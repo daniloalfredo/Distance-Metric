@@ -71,7 +71,10 @@ class K_Modes:
 
 	def cluster(self, DataSet):
 		rows,cols = DataSet.shape
+		PS = []
 		self.Seed_Init(DataSet)
+		if(self.DistType == 'DM2'):
+			PS = Dist.preDM2(DataSet)
 
 		for it in range(self.num_iter):
 			newClusters = [[] for i in range (self.numClusters)]
@@ -83,7 +86,7 @@ class K_Modes:
 				#calcula uma lista de distâncias entre o padrão A e cada centroide
 				for j in range(self.numClusters):
 					B = self.centroids.iloc[j,:]
-					dist.append(Dist.GetDistance(A, B, self.DistType, DataSet)) 
+					dist.append(Dist.GetDistance(A, B, self.DistType, DataSet, PS)) 
 				#O padrão A é inserido no cluster do centroide que der a menor distância
 				minInd = np.argmin(dist)
 				newClusters[minInd].append(i)
