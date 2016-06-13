@@ -2,6 +2,7 @@
 
 import numpy as np
 import pandas as pd
+from math import log
 
 #Função de Distância Hamming
 def Hamming_Distance(InstanceA, InstanceB):
@@ -69,14 +70,58 @@ def DM2(InstanceA, InstanceB, PS, DataSet):
 	Dist /= W
 	return Dist
 
+def preDM3(DataSet):
+	rows, cols = DataSet.shape
+	pS = []
+	R = np.ones([cols, cols])
+	print "OI"
+	#Fórmula (27) do artigo executada para cada atributo
+	for i in range(cols):
+		ps = 0
+		Attri = DataSet.iloc[:,i].cat.categories
+		count = DataSet.iloc[:,i].value_counts()
+		for j in Attri:
+			value = pd.Categorical([j])
+			countAtt = count.loc[value]
+			P = float(countAtt)/rows
+			P_minus = float(countAtt - 1)/(rows - 1)
+			ps += (P*P_minus)
+		pS.append(ps)
+		#Construção da matriz R como definida na equação (37), (33) e (38)
+		for k in range(cols):
+			Attrk = DataSet.iloc[:,k].cat.categories
+			countK = DataSet.iloc[:,k].value_counts()
+			I = 0
+			H = 0
+			#Loop nos valores dos atributos de Xi e Xk
+			for r in Attri:
+				sumR = count.loc[pd.Categorical([r])]
+				p_air = float(sumR)/rows
+				p_air_minus = float(sumR - 1)/(rows - 1)
+				p_air *= p_air_minus
+				for l in Attrk:
+					sumL = countK.loc[pd.Categorical([l])]
+					p_akl = float(sumL)/rows
+					p_akl_minus = float(sumL - 1)/(rows - 1)
+					p_akl *= p_akl_minus
+					p_joint = ((DataSet.iloc[:,i] == r) & (DataSet.iloc[:,k] == l)).mean() #probabilidade conjunta p(air, ajl) Equação (36)
+					I += p_joint*log(p_joint/(p_air*p_akl)) #Equação (33)
+					H -= p_joint*log(p_joint) #Equação (38)
+			R[i][k] = I/H #Equação (37)
+			print "OI DEPOIS DO LOOP"
+	return R	
+
+
 #Função genérica de distância entre dados categóricos
-def GetDistance(InstanceA, InstanceB, DistType, DataSet, Ps):
+def GetDistance(InstanceA, InstanceB, DistType, DataSet, Ps, R):
 	if DistType == 'Hamming':
 		return Hamming_Distance(InstanceA, InstanceB)
 	elif DistType == 'DM1':
 		return DM1(InstanceA, InstanceB, DataSet)
 	elif DistType == 'DM2':
 		return DM2(InstanceA, InstanceB, Ps, DataSet)
+	elif DistType == 'DM3':
+		return DM3(InstanceA, InstanceB, Ps, R, DataSet)
 	else:
 		return 'Distance not found'
 

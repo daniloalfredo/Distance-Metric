@@ -22,12 +22,14 @@ for i in range(0,cols-1):
     dataSet.iloc[:, i] = dataSet.iloc[:, i].astype('category') #Transforma os dados para a representação categórica do Pandas
 
 
-#Executa o K-Modes com os parametros acima
+'''#Executa o K-Modes com os parametros acima
 kmode = K.K_Modes(numClusters, DistType, num_iter=numero_iteracoes)
 print "Clustering Soybean..."
 kmode.cluster(dataSet)
 
-kmode.displayClusters(dataSet)
+kmode.displayClusters(dataSet)'''
+
+PS,R = Dist.preDM3(dataSet)
 
 '''indA = randint(0, rows)
 indB = randint(0, rows)    
