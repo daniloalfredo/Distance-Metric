@@ -74,7 +74,7 @@ def preDM3(DataSet):
 	rows, cols = DataSet.shape
 	pS = []
 	R = np.ones([cols, cols])
-	print "OI"
+	#print "OI"
 	#Fórmula (27) do artigo executada para cada atributo
 	for i in range(cols):
 		ps = 0
@@ -95,21 +95,25 @@ def preDM3(DataSet):
 			H = 0
 			#Loop nos valores dos atributos de Xi e Xk
 			for r in Attri:
+				#print "OI DPS DO LOOP"
 				sumR = count.loc[pd.Categorical([r])]
 				p_air = float(sumR)/rows
-				p_air_minus = float(sumR - 1)/(rows - 1)
-				p_air *= p_air_minus
+				#p_air_minus = float(sumR - 1)/(rows - 1)
+				#p_air *= p_air_minus
 				for l in Attrk:
 					sumL = countK.loc[pd.Categorical([l])]
 					p_akl = float(sumL)/rows
-					p_akl_minus = float(sumL - 1)/(rows - 1)
-					p_akl *= p_akl_minus
+					#p_akl_minus = float(sumL - 1)/(rows - 1)
+					#p_akl *= p_akl_minus
 					p_joint = ((DataSet.iloc[:,i] == r) & (DataSet.iloc[:,k] == l)).mean() #probabilidade conjunta p(air, ajl) Equação (36)
-					I += p_joint*log(p_joint/(p_air*p_akl)) #Equação (33)
-					H -= p_joint*log(p_joint) #Equação (38)
-			R[i][k] = I/H #Equação (37)
-			print "OI DEPOIS DO LOOP"
-	return R	
+					if (p_joint > 0):
+						I += p_joint*log(p_joint/(p_air*p_akl), 10) #Equação (33)
+						H -= p_joint*log(p_joint, 10) #Equação (38)
+			if (k == i):
+				R[i][k] = 1
+			else:
+				R[i][k] = I/H #Equação (37)
+	return (pS, R)	
 
 
 #Função genérica de distância entre dados categóricos
