@@ -10,6 +10,7 @@ import numpy as np
 import pandas as pd
 from random import sample
 import Distances as Dist
+import csv
 
 class K_Modes:
 	"""Classe K-Modes
@@ -29,6 +30,7 @@ class K_Modes:
 			DM3 -> Versão completa do novo método
 		centroids --> Auto-explicativo, são as centroides de cada cluster encontrado
 		clusters --> Os objetos pertencentes a cada cluster
+		c_distance --> Distâncias intra e inter-clusters (matriz)
 
 	Métodos:
 	__init__ --> construtor
@@ -78,18 +80,19 @@ class K_Modes:
 		if(self.DistType == 'DM2'):
 			PS = Dist.preDM2(DataSet)
 		elif(self.DistType == 'DM3'):
+			print "Calculando R, PS e Beta..."
 			PS, R, Beta = Dist.preDM3(DataSet)
 		for it in range(self.num_iter):
 			newClusters = [[] for i in range (self.numClusters)]
 			#agrupa os padrões de acordo com os centroides
-			print "iteracao" + str(it)
+			print "iteracao " + str(it+1)
 			for i in range(rows): 
 				A = DataSet.iloc[i,:] 
 				dist = []
 				#calcula uma lista de distâncias entre o padrão A e cada centroide
 				for j in range(self.numClusters):
 					B = self.centroids.iloc[j,:]
-					dist.append(Dist.GetDistance(A, B, self.DistType, DataSet, PS)) 
+					dist.append(Dist.GetDistance(A, B, self.DistType, DataSet, PS, R, Beta)) 
 				#O padrão A é inserido no cluster do centroide que der a menor distância
 				minInd = np.argmin(dist)
 				newClusters[minInd].append(i)
@@ -107,3 +110,33 @@ class K_Modes:
 			print DataSet.iloc[self.clusters[i],:]
 
 		return
+
+	def get_cluster_distance(self, DataSet, cluster_A, cluster_B, PS, Beta, R):
+		AAD = 0
+		size = len(cluster_A) * len(cluster_B)
+		for i in cluster_A:
+			Xa = DataSet.iloc[i,:]
+			for j in cluster_B:
+				Xb = DataSet.iloc[j,:]
+				AAD += Dist.GetDistance(Xa, Xb, self.DistType, DataSet, PS, R, Beta)
+
+		AAD /= size
+		return AAD
+
+	def getResults(self, DataSet):
+		PS = []
+		R = []
+		Beta = 0
+		if(self.DistType == 'DM2'):
+			PS = Dist.preDM2(DataSet)
+		elif(self.DistType == 'DM3'):
+			print "Calculando R, PS e Beta..."
+			PS, R, Beta = Dist.preDM3(DataSet)
+
+		self.c_distance = np.ones([self.numClusters, self.numClusters])
+		for i in range(self.numClusters):
+			for j in range(self.numClusters):
+				self.c_distance[i][j] = self.get_cluster_distance(DataSet, self.clusters[i], self.clusters[j], PS, Beta, R)
+
+		with open('result'+self.DistType+'.csv', 'wb') as csvfile:
+			cursor = csv.writer(csvfile, delimiter = ' ', quotechar='|', quoting=csv.QUOTE_MINIMAL)
