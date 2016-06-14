@@ -7,7 +7,7 @@ from math import log
 #Função de Distância Hamming
 def Hamming_Distance(InstanceA, InstanceB):
 	buliano = InstanceA != InstanceB
-	return buliano.sum()
+	return buliano.mean()
 
 def DM1(InstanceA, InstanceB, DataSet):
 	rows,cols = DataSet.shape
@@ -123,18 +123,11 @@ def DM3(InstanceA, InstanceB, PS, R, Beta, DataSet):
 	for i in range(cols):
 		valueA = InstanceA.iloc[i]
 		valueB = InstanceB.iloc[i]
-		#valueA = pd.Categorical([valueA])
-		#valueB = pd.Categorical([valueB])
 		AttI = DataSet.iloc[:,i]
-		#count = DataSet.iloc[:,i].value_counts() #Retorna um Series (estrutura da dados do Pandas) contendo a quantidade de padrões com cada valor
-		#countA = count.loc[valueA]
-		#countB = count.loc[valueB]
 		Dij = 0
 		for j in range(cols):
 			valueAj = InstanceA.iloc[j]
 			valueBj = InstanceB.iloc[j]
-			#valueAj = pd.Categorical([valueAj])
-			#valueBj = pd.Categorical([valueBj])
 			AttJ = DataSet.iloc[:,j]
 			if (R[i][j] > Beta):
 					prob_eqA = ((AttI == valueA) & (AttJ == valueAj))

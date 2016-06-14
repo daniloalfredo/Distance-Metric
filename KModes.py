@@ -86,7 +86,8 @@ class K_Modes:
 			newClusters = [[] for i in range (self.numClusters)]
 			#agrupa os padrões de acordo com os centroides
 			print "iteracao " + str(it+1)
-			for i in range(rows): 
+			for i in range(rows):
+				print "Row " + str(i) 
 				A = DataSet.iloc[i,:] 
 				dist = []
 				#calcula uma lista de distâncias entre o padrão A e cada centroide
@@ -113,13 +114,18 @@ class K_Modes:
 
 	def get_cluster_distance(self, DataSet, cluster_A, cluster_B, PS, Beta, R):
 		AAD = 0
+		count_i = 0
+		count_j = 0
 		size = len(cluster_A) * len(cluster_B)
+		#print (cluster_B)
 		for i in cluster_A:
 			Xa = DataSet.iloc[i,:]
 			for j in cluster_B:
+				#print "Go " + str(count_i) + " " + str(count_j)
 				Xb = DataSet.iloc[j,:]
 				AAD += Dist.GetDistance(Xa, Xb, self.DistType, DataSet, PS, R, Beta)
-
+				#count_j += 1
+			#count_i += 1
 		AAD /= size
 		return AAD
 
@@ -136,7 +142,11 @@ class K_Modes:
 		self.c_distance = np.ones([self.numClusters, self.numClusters])
 		for i in range(self.numClusters):
 			for j in range(self.numClusters):
-				self.c_distance[i][j] = self.get_cluster_distance(DataSet, self.clusters[i], self.clusters[j], PS, Beta, R)
-
-		with open('result'+self.DistType+'.csv', 'wb') as csvfile:
+				if (i <= j):
+					print "Distance cluster " + str(i) + " and cluster " + str(j) 
+					self.c_distance[i][j] = self.get_cluster_distance(DataSet, self.clusters[i], self.clusters[j], PS, Beta, R)
+				else:
+					self.c_distance[i][j] = self.c_distance[j][i]
+		with open('result'+self.DistType+'_Car.csv', 'wb') as csvfile:
 			cursor = csv.writer(csvfile, delimiter = ' ', quotechar='|', quoting=csv.QUOTE_MINIMAL)
+			cursor.writerows(self.c_distance)
