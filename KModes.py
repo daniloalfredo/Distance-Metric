@@ -72,10 +72,13 @@ class K_Modes:
 	def cluster(self, DataSet):
 		rows,cols = DataSet.shape
 		PS = []
+		R = []
+		Beta = 0
 		self.Seed_Init(DataSet)
 		if(self.DistType == 'DM2'):
 			PS = Dist.preDM2(DataSet)
-
+		elif(self.DistType == 'DM3'):
+			PS, R, Beta = Dist.preDM3(DataSet)
 		for it in range(self.num_iter):
 			newClusters = [[] for i in range (self.numClusters)]
 			#agrupa os padrões de acordo com os centroides

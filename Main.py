@@ -29,7 +29,7 @@ kmode.cluster(dataSet)
 
 kmode.displayClusters(dataSet)'''
 
-PS,R = Dist.preDM3(dataSet)
+PS,R,Beta = Dist.preDM3(dataSet)
 
 '''indA = randint(0, rows)
 indB = randint(0, rows)    
